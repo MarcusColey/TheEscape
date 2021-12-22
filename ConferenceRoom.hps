@@ -1,0 +1,50 @@
+//===========================================
+     // Starter's Script File!
+     //===========================================
+ 
+     //===========================================
+     // This runs when the map first starts
+	 
+	 //-DEMO END-//
+	 //////////////
+	 void Demo_End(string &in asParent, string &in asChild, int alState)
+	 {
+		FadeOut(2.5f);
+		AddTimer("demoend", 2.8f, "Demo_EndSound");
+	 }
+	 
+	 void Demo_EndSound( string &in asTimer)
+	 {
+		PlaySoundAtEntity("reactbreath", "react_pant", "Player", 0, false);
+		SetPlayerActive(false);
+		AddTimer("bodyfall", 1.5f, "Body_FallSound");
+	 }
+	 
+	 void Body_FallSound(string &in asTimer)
+	 {
+		PlaySoundAtEntity("bodyfall", "player_bodyfall", "Player", 0, false);
+	 }
+	 //-DEMO END-//
+	 //////////////
+	
+	 void OnStart()
+     {
+		SetPlayerMoveSpeedMul(0.2f);
+		AddDebugMessage("Script is working", false);
+		PlayMusic("ConferenceRoom_Demo", true, 1, 1.5f, 0, false);
+		
+		//Collide Callbacks
+		AddEntityCollideCallback("Player", "DemoEnd_Area_1", "Demo_End", true, 1);
+     }
+    
+	 //===========================================
+     // This runs when the player enters the map
+     void OnEnter()
+     {
+	 }
+ 
+     //===========================================
+     // This runs when the player leaves the map
+     void OnLeave()
+     {
+     }

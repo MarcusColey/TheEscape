@@ -1,0 +1,166 @@
+//===========================================
+     // Starter's Script File!
+     //===========================================
+ 
+     //===========================================
+     // This runs when the map first starts
+	 
+	 //-FIRST SCARE-//
+	 /////////////////
+	 void SetDoor_Active(string &in asEntity)
+	 {
+		if(bool (GetSwingDoorClosed("Castle_4") == false)){		// If door is open start this
+		SetSwingDoorDisableAutoClose("Castle_4", true);
+		SetEntityActive("DoorClose_Area_1", true);
+		PlayMusic("01_amb_darkness.ogg", true, 1.0f, 2.5f, 0, false);
+		AddDebugMessage("The door is open", false);
+		}
+		if(bool (GetSwingDoorClosed("Castle_4") == true)){		// If door is closed start this
+		PlayMusic("01_amb_darkness.ogg", true, 1.0f, 2.5f, 0, false);
+		AddDebugMessage("The door is closed", false);
+		}
+	 }
+	 
+	 void Door_Close(string &in asParent, string &in asChild, int alState)
+	 {
+		SetLanternDisabled(true);
+		AddTimer("closedoorsound", 0.3f, "Door_Sound");
+		SetSwingDoorClosed("Castle_4", true, false);
+		AddTimer("running", 0.8f, "Running_Sound");
+		GiveSanityDamage(25.0f, true);
+		AddTimer("wallcreak", 1.5f, "Start_WallCreak");
+		AddTimer("stopcreak", 8.5f, "Stop_Creak");
+		AddTimer("allowlantern", 2.5f, "Allow_Lantern");
+	 }
+	 
+	 void Door_Sound(string &in asTimer)
+	 {
+		PlaySoundAtEntity("doorclosed", "close_door", "Castle_4", 0, false);
+	 }
+	 
+	 void Running_Sound(string &in asTimer)
+	 {
+		PlaySoundAtEntity("runningsound", "scare_walk_hallway", "Run_Area_1", 0, false);
+		AddTimer("runningarea2", 0.5f, "Running_Sound2");
+	 }
+	 
+	 void Running_Sound2(string &in asTimer)
+	 {
+		PlaySoundAtEntity("runningsound", "scare_walk_hallway", "Run_Area_1", 0, false);
+		AddTimer("runningarea3", 0.5f, "Running_Sound3");
+	 }
+	 
+	 void Running_Sound3(string &in asTimer)
+	 {
+		PlaySoundAtEntity("runningsound", "scare_walk_hallway", "Run_Area_1", 0, false);
+		AddTimer("runningarea4", 0.5f, "Running_Sound4");
+	 }
+	 
+	 void Running_Sound4(string &in asTimer)
+	 {
+		PlaySoundAtEntity("runningsound", "scare_walk_hallway", "Run_Area_1", 0, false);
+	 }
+	 
+	 void Start_WallCreak(string &in asTimer)
+	 {
+		PlaySoundAtEntity("wallcreak", "00_creak", "Player", 0, false);
+	 }
+	 
+	 void Stop_Creak(string &in asTimer)
+	 {
+		StopSound("wallcreak", 3);
+	 }
+	 
+	 void Allow_Lantern(string &in asTimer)
+	 {
+		SetLanternDisabled(false);
+	 }
+	 //-END FIRST SCARE-//
+	 /////////////////////
+	 
+	 //- CHANDELIER EVENT-//
+	 ///////////////////////
+	 void Chandelier_Impulse(string &in asEntity)
+	 {
+		AddPropImpulse("chandelier_simple_short_1", 3, 2, 1, "world");
+		PlaySoundAtEntity("windgust", "general_wind_whirl", "Wind_Area_1", 0, false);
+	 }
+	 //-END CHANDELIRE EVENT-//
+	 //////////////////////////
+	 
+	 //-KEY + DOOR-//
+	 void UseItem_LivingQ(string &in asItem, string &in asEntity)
+	 {
+		PlaySoundAtEntity("unlockdoor", "unlock_door", "level_wood_1", 0, false); // FIX THIS!!
+		SetLevelDoorLocked("level_wood_1", false);
+		RemoveItem("LivingQuartersKey");
+	 }
+	 
+	 //-DEMO-//
+	 void Demo_PlayMusic(string &in asParent, string &in asChild, int alState)
+	 {
+		StopMusic(1.5f, 0);
+		PlayMusic("01_amb_darkness.ogg", true, 1.0f, 2.5f, 0, false);
+	 }
+	 
+	 //-MISC-//
+	 //////////
+	 void Unlock_door(string &in asParent, string &in asChild, int alState)
+	 {
+		SetSwingDoorLocked("castle_1", false, false);
+	 }
+	 
+	 
+     void OnStart()
+     {
+		//SetEntityActive("cellar_wood01_unhinged", false);
+		
+		//Use Item Callback
+		AddUseItemCallback("LivingQDoor", "LivingQuartersKey", "level_wood_1", "UseItem_LivingQ", true);		//FIX THIS!!!
+	 
+		//Entity Collide Callbacks
+		AddEntityCollideCallback("Player", "DoorClose_Area_1", "Door_Close", true, 1);
+		AddEntityCollideCallback("Player", "UnlockDoor_Area_1", "Unlcok_Door", true, 1);
+		
+		//Entity Interact Callbacks
+		SetEntityPlayerInteractCallback("lantern_1", "SetDoor_Active", true);
+		SetEntityPlayerInteractCallback("castle_2", "Chandelier_Impulse", true);
+		
+		//Demo
+		AddEntityCollideCallback("Player", "Demo_PlayMusic", "Demo_PlayMusic", true, 1);
+		
+		SetLocalVarInt("scare_walk_hallway", 0.01f);
+		StopMusic(2, 0);
+		FadeImageTrailTo(0, 1.5f);
+		SetPlayerMoveSpeedMul(1);
+		SetPlayerRunSpeedMul(1);
+		SetPlayerJumpDisabled(false);
+		SetPlayerCrouchDisabled(false);
+		
+		if(bool(HasItem("LivingQuartersKey") == true))
+		{
+			SetEntityActive("castle_1", false);
+			SetEntityActive("castle_4", true);
+			PlayMusic("01_amb_darkness.ogg", true, 1.0f, 2.5f, 0, false);
+		}
+		else
+		{
+			AddDebugMessage("Welcome, LQ Key not in possesion", false);
+		}
+     }
+    
+	 //===========================================
+     // This runs when the player enters the map
+     void OnEnter()
+     {
+		FadeIn(5);
+		PlaySoundAtEntity("doorclose", "close_security", "castle_gate_arched01_1", 0, false);
+		AutoSave();
+		StopMusic(1.5f, 0);
+	 }
+ 
+     //===========================================
+     // This runs when the player leaves the map
+     void OnLeave()
+     {
+     }

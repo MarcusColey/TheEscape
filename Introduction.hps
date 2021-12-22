@@ -1,0 +1,139 @@
+//===========================================
+     // Starter's Script File!
+     //===========================================
+ 
+     //===========================================
+     // This runs when the map first starts
+	 void Start_Message(string &in asTimer)
+	 {
+		SetMessage("Messages", "Intro", 8.5f);
+		FadeIn(6.5);
+	 }
+	 
+	 void Start_Game(string &in asTimer)
+	 {
+		SetPlayerActive(true);
+		/*SetRadialBlurStartDist(0.8f);
+		FadeRadialBlurTo(2.0f, 1.5f);*/
+		FadeImageTrailTo(3,0.5f);
+		SetPlayerMoveSpeedMul(0.2f);
+		SetPlayerRunSpeedMul(0);
+		SetPlayerJumpDisabled(true);
+		SetPlayerCrouchDisabled(false);
+		StartPlayerLookAt("Look_Area_1", 5, 6, "Continue_Intro");
+	 }
+	 
+	 void Continue_Intro()
+	 {
+		AddTimer("teleport", 15.0f, "Teleport");
+		AddTimer("fadeout1", 11.5f, "Fade_Out");
+	 }
+	 
+	 void Fade_Out(string &in asTimer)
+	 {
+		FadeOut(4.5f);
+		//StopPlayerLookAt();
+	 }
+	 
+	 void Teleport(string &in asTimer)
+	 {
+		StopPlayerLookAt();
+		TeleportPlayer("PlayerStartArea_2");
+		StartPlayerLookAt("Look_Area_2", 5, 6, "Window_Monster");
+		SetMessage("Messages", "Intro2", 6.5f);
+		AddTimer("finishintro", 2.5f, "Finish_Intro");
+	 }
+	 
+	 void Finish_Intro(string &in asTimer)
+	 {
+		FadeIn(5);
+	 }
+	 
+	 void End(string &in asParent, string &in asChild, int alState)
+	 {
+		FadeOut(3.5f);
+		AddTimer("stopplayer", 2.5f, "Stop_Player");
+		AddTimer("footsteps", 3.5f, "Ending_Footsteps");	
+		AddTimer("castledoor", 8.5f, "Ending_DoorOpen");
+	 }
+	 
+	 void Stop_Player(string &in asTimer)
+	 {
+		SetPlayerActive(false);
+	 }
+	 
+	 void Ending_Footsteps(string &in asTimer)
+	 {
+		PlaySoundAtEntity("stepwalkdirt", "step_walk_dirt", "Player", 0, true);
+		AddTimer("step2", 1.5f, "Second_Step");
+	 }
+	 
+	 void Second_Step(string &in asTimer)
+	 {
+		PlaySoundAtEntity("stepwalkdirt", "step_walk_dirt", "Player", 0, true);
+		AddTimer("step3", 1.5f, "Third_Step");
+	 }
+	 
+	 void Third_Step(string &in asTimer)
+	 {
+		PlaySoundAtEntity("stepwalkdirt", "step_walk_dirt", "Player", 0, true);
+	 }
+	 
+	 void Ending_DoorOpen(string &in asTimer)
+	 {
+		PlaySoundAtEntity("dooropen", "door_large_castle_open", "Player", 0, false);
+		AddTimer("switchmap", 1.5f, "Switch_Map");
+	 }
+	 
+	 void Switch_Map(string &in asTimer)
+	 {
+		StopPlayerLookAt();
+		ChangeMap("CastleEntrance.map", "PlayerStartArea_1", "", "");
+	 }
+	 
+	/* void Window_Monster()
+	 {
+		SetEntityActive("servant_grunt_1", true);
+		AddEnemyPatrolNode("servant_grunt_1", "PathNodeArea_1", 0, "");
+	 }
+	 
+	 void Window_MonsterLeave(string &in asParent, string &in asChild, int alState)
+	 {
+		SetEntityActive("Servent_grunt_1", false);
+	 }*/
+	 
+     void OnStart()
+     {
+		//Entity Collide callbacks
+		AddEntityCollideCallback("servant_grunt_1", "Enemy_Area_1", "Window_MonsterLeave", true,  1); //Un-Used
+		AddEntityCollideCallback("Player", "ScriptArea_1", "End", true, 1);
+		
+		FadeOut(0);
+		SetPlayerActive(false);
+		AddTimer("beginningmsg", 0.5f, "Start_Message");
+		AddTimer("startgame", 1, "Start_Game");
+		SetLocalVarInt("servant_grunt_1", 0);
+		/* if(ScriptDebugOn())
+          {
+               GiveItemFromFile("lantern", "lantern.ent");
+               SetPlayerLampOil(100.0f);
+ 
+               for(int i = 0;i < 10;i++)
+               {
+                    GiveItemFromFile("tinderbox", "tinderbox.ent");
+               }
+          }*/
+     }
+	
+     //===========================================
+     // This runs when the player enters the map
+     void OnEnter()
+     {
+		PlayMusic("Custom_Scary_Music", false, 1, 5, 0, false);
+	 }
+ 
+     //===========================================
+     // This runs when the player leaves the map
+     void OnLeave()
+     {
+     }

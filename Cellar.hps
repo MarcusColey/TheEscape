@@ -1,0 +1,266 @@
+//===========================================
+     // Starter's Script File!
+     //===========================================
+ 
+     //===========================================
+     // This runs when the map first starts
+	 
+	 //-START FOOTSTEPS-//
+	 /////////////////////
+	 void Creak_Sounds(string &in asTimer)
+	 {
+		int iCreak = RandInt(1, 3);
+		float fCreak = RandFloat(10.5f, 18.0f);
+		
+		PlaySoundAtEntity("creaksounds"+iCreak, "scare_wood_creak_scuf", "WalkArea_"+iCreak, 0, false);
+		CreateParticleSystemAtEntity("creakps"+iCreak, "ps_dust_falling_small", "WalkArea_"+iCreak, false);
+		
+		AddTimer("creaktimer", 10.0f+fCreak, "Creak_Sounds");
+		//Debug
+		AddDebugMessage("Now creaking in area: "+iCreak, false);
+	 }
+	 //-END FOOTSTEPS-//
+	 ///////////////////
+	 
+	 //-START CHAIN RATTLE-//
+	 ////////////////////////
+	 void Chain_Rattle(string &in asTimer)
+	 {
+		int iRattle = RandInt(1, 3);
+		float fRattle = RandFloat(15.5f, 25.0f);
+		
+		PlaySoundAtEntity("chainrattle"+iRattle, "general_chain_rattle_single", "ChainArea_"+iRattle, 0, false);
+		
+		AddTimer("chainrattle", 10.0f, "Chain_Rattle");
+		//Debug
+		AddDebugMessage("Now rattling in area: "+iRattle, false);
+	 }
+	 //-END CHAIN RATTLE-//
+	 //////////////////////
+	 
+	 //-START SCRATCHING-//
+	 //////////////////////
+	 void Scratch_Sounds(string &in asTimer)
+	 {
+		int iScratch = RandInt(1, 3);
+		float fScratch = RandFloat(20.5, 28.0f);
+		
+		PlaySoundAtEntity("scratchsound"+iScratch, "03_wall_scratch", "ScratchArea_"+iScratch, 0., false);
+		
+		AddTimer("scratchtimer", 10.0f, "Scratch_Sounds");
+		//Debug
+		AddDebugMessage("Now scratching in area: "+iScratch, false);
+	 }
+	 //-END SCRATCHING-//
+	 ////////////////////
+	 
+	 //-START MOAN SCARE-//
+	 //////////////////////
+	 void Moan_Scare(string &in asTimer)
+	 {
+		int iMoan = RandInt(1, 2);
+		float fMoan = RandFloat(180.5, 200.8f);
+		
+		PlaySoundAtEntity("moanscare"+iMoan, "scare_male_terrified", "MoanScareArea_"+iMoan, 0, false);
+		
+		AddTimer("moanscaretimer", 10.5f, "Moan_Scare");
+		//Debug
+		AddDebugMessage("Now moaning in area: "+iMoan, false);
+	 }
+	 
+	 /*void GhostMoan_Scare(string &in asTimer)
+	 {
+		int igMoan = RandInt(1, 2);
+		float fgMoan = RandFloat(250.5, 300.0f);
+		
+		PlaySoundAtEntity("ghostmoanscare"+igMoan, "scare_ghost", "GhostScareArea_"+igMoan, 0, false);
+		
+		AddTimer("moanscaretimer", 15.5f, "GhostMoan_Scare");
+		//Debug
+		AddDebugMessage("Now Gmoaning in area: "+igMoan, false);
+	 }*/
+	 //-END MOAN SCARE-//
+	 ////////////////////
+	 
+	 //-START WOOD CREAK TRIGGER-//
+	 ////////////////////////
+	 void FootSteps_Trigger(string &in asParent, string &in asChild, int alState)
+	 {
+		PlaySoundAtEntity("footstepstrigger", "scare_wood_creak_walk", "TriggeredFootsteps_Area", 0, false); /////////- FIX THIS!--/////////
+		CreateParticleSystemAtEntity("creakps2", "ps_dust_falling_small", "TriggeredFootsteps_Area", false);
+		//Debug
+		AddDebugMessage("Creak triggerd NOW!!!", false);
+	 }
+	 //-END WOOD CREAK TRIGGER-//
+	 ////////////////////////////
+	 
+	 //-DOOR SCARE-//
+	 ////////////////
+	 void Door_Scare(string &in asParent, string &in asChild, int alState)
+	 {
+		PlaySoundAtEntity("hitwood", "hit_wood", "HitWood_1", 0, false);
+		CreateParticleSystemAtEntity("hitdust", "ps_hit_wood", "HitWood_1", false);
+		AddPropImpulse("doorpush", 0, 0, -2, "world");
+		GiveSanityDamage(10.0f, false);
+	 }
+	 //-DOOR SCARE-//
+	 ////////////////
+	 
+	 //-ENEMY SOUND SCARE-//
+	 ///////////////////////
+	 void Enemy_Sound(string &in asEntity, int alState)
+	 {
+		FadeRadialBlurTo(0.4f, 2.5f);
+		SetRadialBlurStartDist(0.8f);
+		AddTimer("enemysoudntimer", 2.5f, "EnemySound_Timer");
+		PlaySoundAtEntity("whineloop", "scare_whine_loop4", "Player", 0, false);
+	 }
+	 
+	 void EnemySound_Timer(string &in asTimer)
+	 {
+		PlaySoundAtEntity("enemynoise", "notice_long", "EnemyNoise_Area", 0, false);
+		GiveSanityDamage(10.0f, true);
+		AddTimer("returnveiw", 3.0f, "ReturnView_Normal");
+	 }
+	 
+	 void ReturnView_Normal(string &in asTimer)
+	 {
+		FadeRadialBlurTo(0, 2.5f);
+	 }
+	 //-ENEMY SOUND SCARE-//
+	 ///////////////////////
+	 
+	 //-HALLWAY RUN-//
+	 /////////////////
+	 void HallwayRun_Active(string &in asEntity)
+	 {
+		AddGlobalVarInt("TelePlayer", 0);
+		SetGlobalVarInt("TelePlayer", 1);
+		AddDebugMessage("VarInt TelePlayer set to 1", false);
+	 }
+	 
+	 void Teleport_Player(string &in asParent, string &in asChild, int alState)
+	 {
+		if(GetGlobalVarInt("TelePlayer") == 1)
+		{
+			//SetEntityActive("PlayerTeleportArea_1", true);
+			AddDebugMessage("Teleport area is now active", false);
+			PlaySoundAtEntity("playerbreath", "react_breath_slow", "Player", 0, false);
+			PlaySoundAtEntity("gurdian", "guardian_distant2", "Player", 0, false);
+			FadeOut(3.5f);
+			StartScreenShake(0.1f, 3, 3.5f, 1);
+			AddTimer("playertele", 4.0f, "Tele_Player");
+		}
+		
+		else
+		{
+			AddDebugMessage("Living quarters key is not in your possesion", false);
+		}
+	 }
+	 
+	 void Tele_Player(string &in asTimer)
+	 {
+		SetPlayerActive(false);
+		TeleportPlayer("PlayerStartArea_2");
+		AddTimer("fadein", 1.8f, "Fade_In");
+	 }
+	 
+	 void Fade_In(string &in asTimer)
+	 {
+		SetPlayerActive(true);
+		FadeIn(3.5f);
+		PlaySoundAtEntity("playerbreath2", "react_breath", "Player", 0, false);
+	 }
+	 
+	 void Activate_Enemy(string &in asParent, string &in asChild, int alState)
+	 {
+		SetEntityActive("servant_grunt_1", true);
+		ShowEnemyPlayerPosition("servant_grunt_1");
+		AddEnemyPatrolNode("node1", "PathNodeArea_1", 0, "");
+		SetPropHealth("cellar_wood01_slow_3", 0);
+		AddTimer("changemusic", 0, "Change_Music");
+	 }
+	 
+	 void Change_Music(string &in asTimer)
+	 {
+		StopMusic(0, 0);
+		PlayMusic("att_suitor", true, 1, 3, 0, false);
+		AddDebugMessage("Changeing Music ^^", false);
+	 }
+	 
+	 void Play_Sound(string &in asParent, string &in asChild, int alState)
+	 {
+		PlaySoundAtEntity("enemysound", "amb_hunt", "Player", 0, false);
+	 }
+	 
+	 void ActivateGrunt_2(string &in asParent, string &in asChild, int alState)
+	 {
+		SetEntityActive("servant_grunt_1", false);
+		SetEntityActive("servant_grunt_2", true);
+		AddEnemyPatrolNode("path2", "PathNodeArea_2", 0, "");
+		ShowEnemyPlayerPosition("servant_grunt_2");
+		SetPropHealth("cellar_wood01_slow_5", 0);
+	 }
+	 
+	 void ActivateGrunt_3(string &in asParent, string &in asChild, int alState)
+	 {
+		SetEntityActive("servant_grunt_1", false);
+		SetEntityActive("servant_grunt_3", true);
+		ShowEnemyPlayerPosition("servent_grunt_3");
+	 }
+	 //-HALLWAY RUN-//
+	 /////////////////
+	 
+     void OnStart()
+     {
+	 //GiveItemFromFile("lantern", "lantern.ent");
+ 
+		//for(int i=0;i< 10;i++) GiveItemFromFile("tinderbox_"+i, "tinderbox.ent");
+		
+		//Timer Init
+		AddTimer("creak", 5.0f, "Creak_Sounds");
+		AddTimer("chain", 1.0f, "Chain_Rattle");
+		AddTimer("scratch", 2.5f, "Scratch_Sounds");
+		AddTimer("moanscaretimer", 5.5f, "Moan_Scare");
+		AddTimer("moanscaretimer", 40.5f, "GhostMoan_Scare");
+		
+		//Entity CollideCallbacks
+		AddEntityCollideCallback("Player", "FootSteps_TriggerArea", "Footsteps_Trigger", true, 1);
+		AddEntityCollideCallback("Player", "DoorScareArea_1", "Door_Scare", true, 1);
+		AddEntityCollideCallback("Player", "PlayerTeleportArea_1", "Teleport_Player", false, 1);
+		AddEntityCollideCallback("Player", "Active_Entity", "Activate_Enemy", true, 1);
+		AddEntityCollideCallback("Player", "EnemySound_1", "Play_Sound", true, 1);
+		AddEntityCollideCallback("Player", "ActiveEnemy_2", "ActivateGrunt_2", true, 1);
+		AddEntityCollideCallback("Player", "AcitveEnemy_3", "ActivateGrunt_3", true, 1);
+		AddEntityCollideCallback("Player", "EnemySound_2", "Play_Sound", true, 1);
+		AddEntityCollideCallback("Player", "EnemySound_3", "Play_Sound", true, 1);
+		
+		//Entity LookAt Callback
+		SetEntityPlayerLookAtCallback("EnemySound_Scare", "Enemy_Sound", true);
+		
+		//Entity Player interact
+		SetEntityPlayerInteractCallback("LivingQuartersKey", "HallwayRun_Active", true); 
+	
+		//Sound Init
+		PlaySoundAtEntity("amb_sound1", "05_amb1", "AmbArea_1", 10, true);
+		
+		//Lights
+		SetLightVisible("PointLight_5", false);
+		SetLightVisible("PointLight_6", false);
+	
+     }
+    
+	 //===========================================
+     // This runs when the player enters the map
+     void OnEnter()
+     {
+		StopMusic(1.5f, 0);
+		PlayMusic("04_amb", true, 1, 5, 0, true);
+		AutoSave();
+	 }
+ 
+     //===========================================
+     // This runs when the player leaves the map
+     void OnLeave()
+     {
+     }

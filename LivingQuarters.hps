@@ -1,0 +1,407 @@
+//===========================================
+     // Starter's Script File!
+     //===========================================
+ 
+     //===========================================
+     // This runs when the map first starts
+    
+	//-START SECRET SHELF- //
+	/////////////////////////
+	void Move_Shelf(string &in asConnectionName, string &in asMainEntity, string &in asConnectEntity, int alState)
+	 {
+		GiveSanityBoostSmall();
+		AddTimer("Success_Music", 1, "Play_Success_Music");
+		CreateParticleSystemAtEntity("PSDoorDust", "ps_dust_falling_door.ps", "Secret_Shelf", false);
+		CompleteQuest("testquest", "TestQuest");
+	 }
+	 
+	 void Move_Shelf_1(string &in asConnectionName, string &in asMainEntity, string &in asConnectEntity, int alState)
+	 {
+		PlaySoundAtEntity("muffledstep", "insanity_muffled_steps", "Secret_Shlef", 0.0f, false);
+	 }
+	 
+	 void Play_Success_Music(string &in asTimer)
+	 {
+		PlayMusic("01_puzzle_passage.ogg", false, 1, 0, 5, false);
+	 }
+	 //-END SECRET SHELF-//
+	 //////////////////////
+	 
+	 //-START KEY QUEST-//
+	 /////////////////////
+	 void GetTestQuest(string &in entity)
+	 {
+		AddQuest("testquest", "TestQuest");
+		SetEntityActive("Active_EntityArea_1", true);
+	 }
+	 //-END KET QUEST-//
+	 ///////////////////
+	 
+	 //-START MONSTER SIGHTING-//
+	 ////////////////////////////
+	 void Monster_Sighting(string &in asParent, string &in asChild, int alState)
+	 {
+	 /*	SetSwingDoorLocked("Gust_Door_2", false, false);
+		SetSwingDoorClosed("Gust_Door_2", false, false);
+		SetSwingDoorDisableAutoClose("Gust_Door_2", true);
+		SetMoveObjectState("Gust_Door_2", 1);
+		
+		SetSwingDoorClosed("Gust_Door_1", false, false);
+		SetSwingDoorDisableAutoClose("Gust_Door_1", true);
+		SetMoveObjectState("Gust_Door_1", 1); */
+		
+		SetLampLit("candlestick_wall_5", false, true);
+		SetLampLit("candlestick_wall_6", false, true);
+		SetLightVisible("PointLight_9", false);
+		
+		CreateParticleSystemAtEntity("paperblow", "ps_dust_paper_blow", "Paper_BlowArea_1", false);
+		
+		GiveSanityDamage(10.0f, true);
+		
+		PlaySoundAtEntity("windblow", "general_wind_whirl", "Active_EntityArea_1", 0.0f, false);
+		AddTimer("monstersighting", 2.0f, "Active_Entity");
+		
+		AddDebugMessage("The door should have gust open...", false);
+	 }
+	 //-END MONSTER SIGHTING-//
+	 //////////////////////////
+	 
+	 //-ACTIVATE LIGHTS ON INTERACT START-//
+	 /////////////////////////////////
+	 void Active_Light(string &in entity)
+	 {
+		SetLightVisible("PointLight_26", true);
+	 }
+	 
+	 void Active_Light_2(string &in entity)
+	 {
+		SetLightVisible("PointLight_27", true);
+	 }
+	 //-ACITVATE LGIHTS ON INTERACT END-//
+	 /////////////////////////////////
+	 
+	 //-START ACTIVATE ENTITY-//
+	 ///////////////////////////
+	 void Active_Entity(string &in asTimer)
+	 {
+		SetEntityActive("servant_grunt_1", true);
+		AddEnemyPatrolNode("servant_grunt_1", "PathNodeArea_1", 5.0f, "");
+		AddEnemyPatrolNode("servant_grunt_1", "PathNodeArea_2", 0.0f, "");
+		SetEntityPlayerLookAtCallback("servant_grunt_1", "Player_SanityDmg", true);
+		PlaySoundAtEntity("playerbreath", "react_scare", "Player", 0.0f, false);
+	 }
+	 //-END ACTIVE ENTITY-//
+	 ///////////////////////
+	 
+	 //-START ENEMY LEAVE GAME SPACE-//
+	 //////////////////////////////////
+	 void Enemy_LeaveArea(string &in asParent, string &in asChild, int alState)
+	 {
+		SetEntityActive("servent_grunt_1", false);
+		PlaySoundAtEntity("leveldooropen", "door_level_wood_open", "Enemy_LeaveArea_1", 0.0f, false);
+	 }
+	 //-ENEMY LEAVE GAME SPACE END-//
+	 ////////////////////////////////
+	 
+	 //-START PLAYER SANITY-//
+	 /////////////////////////
+	 void PlayerSanityDmg(string &in entity)
+	 {
+		PlaySoundAtEntity("playerbreath", "react_scare", "Player", 0.0f, false);
+		GiveSanityDamage(10.0f, true);
+	 }
+	 //-END PLAYER SANITY-//
+	 ///////////////////////
+	 
+	 //-START INTERACT WITH CABINET-//
+	 /////////////////////////////////
+	 void Enemy_Noise(string &in entity)
+	 {
+		PlaySoundAtEntity("enemywhimp", "amb_idle_whimp", "Enemy_NoiseArea_1", 0.0f, false);
+	 }
+	 //-END INTERACT WITH CABINET-//
+	 ///////////////////////////////
+	 
+	 //-START LAST SCARE-//
+	 //////////////////////
+	 void Look_Monster(string &in asParent, string &in asChild, int alState)
+	 {
+		SetLanternDisabled(true);
+		//SetLeverStuckState("Secret_Lever_1", 1, false);
+		SetInventoryDisabled(true);
+		GiveSanityDamage(10.0f, true);
+		SetSanityDrainDisabled(true);
+		SetEntityActive("servant_grunt_2", true);
+		StartPlayerLookAt("servant_grunt_2", 5.5f, 6.0f, "Look_Monster_Scare");
+		AddTimer("allowdisabled", 1.5f, "Allow_Disabled");
+		AddTimer("radialblur", 1.5f, "Set_Blur");
+		AddTimer("active_slime", 0.1f, "Active_Slime");
+	 }
+	 
+	 void Look_Monster_Scare()
+	 {
+		PlaySoundAtEntity("playerscream", "react_breath_no3d", "Player", 0.0f, false);
+		AddTimer("stopplayerlook", 0.5f, "Stop_PlayerLook");
+	 }
+	 
+	 void Stop_PlayerLook(string &in asTimer)
+	 {
+		StopPlayerLookAt();
+	 }
+	 
+	 void Allow_Disabled(string &in asTimer)
+	 {
+		SetLanternDisabled(false);
+		SetInventoryDisabled(false);
+	 }
+	 
+	 void Set_Blur(string &in asTimer)
+	 {
+		FadeRadialBlurTo(4.5, 2.0f);
+	 }
+	 
+	 void Active_Slime(string &in asTimer)
+	 {
+		SetEntityActive("LookAt_SlimeArea_1", true);
+		SetEntityActive("slime_3way_1", true);
+		SetEntityActive("slime_egg_1", true);
+		PlaySoundAtEntity("slime_sound", "slime_loop", "Slime_SoundArea_1", 1.5f, false);
+	 }
+	 
+	 void Look_Slime(string &in asParent, string &in asChild, int alState)
+	 {
+		StartPlayerLookAt("Slime_SoundArea_1", 4.5f, 5.0f,"Look_Slime_Scare");
+	 }
+	 
+	 void Look_Slime_Scare()
+	 {
+		PlaySoundAtEntity("guardiansound", "guardian_distant2", "Player", 0.0f, false);
+		StartScreenShake(0.009f, 2.5f, 1.5f, 1.5f);
+		SetLightVisible("PointLight_29", true);
+		SetLightVisible("PointLight_30", true);
+		StopPlayerLookAt();
+	 }
+	 //-END LAST SCARE-//
+	 ////////////////////
+	 
+	 //-START FOOTSTEPS ABOVE STUDY-//
+	 /////////////////////////////////
+	 void CreakTimer(string &in asTimer)
+	 {
+		int iCreak = RandFloat(1, 3);
+		float fCreak = RandFloat(10.5f, 20.5f);
+		
+		PlaySoundAtEntity("CreakSound"+iCreak, "scare_wood_creak_mix", "Creak_"+iCreak, 0.0f, false);
+		CreateParticleSystemAtEntity("CreakPS"+iCreak, "ps_dust_falling_small", "Creak_"+iCreak, false);
+		
+		AddTimer("creak", 10.5f+fCreak, "CreakTimer");
+		
+		/*Debug
+		*/
+		AddDebugMessage("Now creaking in area: "+iCreak, false);
+	 }
+	 //-END FOOTSTEPS ABOVE STUDY-//
+	 ///////////////////////////////
+	 
+	 //-START SCRATCH SOUNDS-//
+	 //////////////////////////
+	 void Scratch_Sounds(string &in asTimer)
+	 {
+		int iScratch = RandFloat(1, 2);				//How many area's you want to play the sound int
+		float fScratch = RandFloat(15.5f, 20.5f);	// Time between each sound that is played
+		
+		PlaySoundAtEntity("ScratchSound"+iScratch, "03_wall_scratch", "ScratchSound_"+iScratch, 0.0f, false);
+		
+		AddTimer("ScratchSounds", 10.5f+fScratch, "Scratch_Sounds");
+		
+		/*Dubug
+		*/
+		AddDebugMessage("Now scratching in area: "+iScratch, false);
+	 }
+	 //-END SCRATCH SOUNDS-//
+	 ////////////////////////
+	 
+	 //-START WIND SOUNDS-//
+	 ////////////////
+	 void Wind_Sounds(string &in asTimer)
+	 {
+		int iWind = RandFloat(1,4);
+		float fWind = RandFloat(17.5f, 25.5f);
+		
+		PlaySoundAtEntity("WindSounds"+iWind, "general_wind_whirl_rand", "WindSound_"+iWind, 0.0f, false);
+		
+		AddTimer("WindSounds", 7.5f+fWind, "Wind_Sounds");
+		
+		/*Debug
+		*/
+		AddDebugMessage("Wind now blowing in area: "+iWind, false);
+	 }
+	 //-END WIND SOUNDS -//
+	 //////////////////////
+	 
+	 //-START EERIE WIND-//
+	 void Eerie_Wind(string &in asTimer)
+	 {
+		PlaySoundAtEntity("EerieWind", "ambience_wind_eerie", "Eerie_WindArea_1", 0.0f, false);
+	 }
+	 //-END EERIE WIND-//
+	 
+	 //-START LIBRARY SOUND-//
+	 void Library_Sound(string &in asTimer)
+	 {
+		PlaySoundAtEntity("LibrarySound", "03_amb_library", "LibrarySound_Area_1", 3.5f, false);
+	 }
+	 //-END LIBRARY SOUND-//
+	 
+	 //-STUDY KEY-//
+	  void UseKeyOnDoor (string &in asItem, string &in asEntity)
+	 {
+		SetSwingDoorLocked("mansion_2", false, true);
+		PlaySoundAtEntity("Unlockstudydoor", "unlock_door", "mansion_2", 0, false);
+		RemoveItem("StudyKey");
+	 }
+	 //-STUDY KEY-//
+	 
+	 //-DESK DOOR KEY-//
+	 void UseKeyOnDeskDoor(string &in asItem, string &in asEntity)
+	 {
+		SetSwingDoorLocked("work_desk_door_2", false, true);
+		PlaySoundAtEntity("unlockdeskdoot", "lock_door", "work_desk_door_2", 0.0f, false);
+		RemoveItem("Desk Key");
+	 }
+	 //-DESK DOOR KEY END-//
+	 
+	 //-RITUAL-//
+	 ////////////
+	 
+	 void If_Statement1(string &in asEntity)
+	 {
+		if(GetLocalVarInt("candle_floor_5") == 1)			//Candles start at 1
+		{			
+		SetLocalVarInt("candle_floor_6", 2);				//If you interact(Light) candle 5, candle 6 is set to 2!
+		AddDebugMessage("Candle 5 is lit", false);
+		}
+		
+			else if(GetLocalVarInt("candle_floor_5") == 2)			//If you interact(Light) the other candle first This happens!
+			{
+			PlaySoundAtEntity("windwirl", "general_wind_whirl", "DustWind_Area_1", 0, false);
+			CreateParticleSystemAtEntity("dustwhirl", "ps_dust_whirl_large.ps", "DustWind_Area_1", false);
+			SetLampLit("candle_floor_4", false, true);
+			SetLampLit("candle_floor_5", false, true);
+			SetLampLit("candle_floor_6", false, true);
+			SetLampLit("candlestick02_1", false, true);
+			PlaySoundAtEntity("enemyscare", "alois_notice", "Player", 0, false);
+			AddTimer("enemyscareattack", 1.5f, "Play_EnemyAttack");
+			AddDebugMessage("Main event happens.. NOW!", false);	// <--- This is were the main event go's
+			}
+	 }
+	 
+	 void If_Statement2(string &in asEntity)
+	 {
+		if(GetLocalVarInt("candle_floor_6") == 1)			// Candle 6 starts at 1
+		{			
+		SetLocalVarInt("candle_floor_5",  2);				//If you interact(Light) candle 6, candle 5 is set to 2!
+		AddDebugMessage("Candle 6 is lit", false);
+		}
+		
+			else if(GetLocalVarInt("candle_floor_6") == 2)			//If you interact(Light) the other candle first This happens!
+			{
+			PlaySoundAtEntity("windwirl", "general_wind_whirl", "DustWind_Area_1", 0, false);
+			CreateParticleSystemAtEntity("dustwhirl", "ps_dust_whirl_large.ps", "DustWind_Area_1", false);
+			SetLampLit("candle_floor_4", false, true);
+			SetLampLit("candle_floor_5", false, true);
+			SetLampLit("candle_floor_6", false, true);
+			SetLampLit("candlestick02_1", false, true);
+			PlaySoundAtEntity("enemyscare", "alois_notice", "Player", 0, false);			// } 
+			AddTimer("enemyscareattack", 1.5f, "Play_EnemyAttack");							//	 <--- This is were the main event go's
+			AddDebugMessage("Lighting candles in a different order wrks too!", false);		// }
+			}
+	 }
+	 
+	 void Play_EnemyAttack(string &in asTimer)
+	 {
+		PlaySoundAtEntity("enemyattack", "alois_attack_claw", "Player", 0, false);
+		PlaySoundAtEntity("attackhit", "attack_claw_hit", "Player", 0, false);
+		GivePlayerDamage(15, "claw", true, false);
+	 }
+	 //-RITUAL-//
+	 ////////////
+	 
+	void OnStart()
+     {
+		//GiveItemFromFile("lantern", "lantern.ent");
+ 
+		//for(int i=0;i< 10;i++) GiveItemFromFile("tinderbox_"+i, "tinderbox.ent");
+		
+		SetLocalVarInt("guardian_distant2", 0.15f);
+		SetLocalVarInt("candle_floor_5", 1);
+		SetLocalVarInt("candle_floor_6", 1);
+		
+		//-Light states-//
+		SetLightVisible("PointLight_26", false);
+		SetLightVisible("PointLight_27", false);
+		SetLightVisible("PointLight_29", false);
+		SetLightVisible("PointLight_30", false);
+		
+		//-Use item callbacks-//
+		AddUseItemCallback("", "StudyKey", "mansion_2", "UseKeyOnDoor", true);
+		AddUseItemCallback("", "Desk Key", "work_desk_door_2", "UseKeyOnDeskDoor", true);
+		
+		//-Entity Collide Callbacks-//
+		AddEntityCollideCallback("Player", "Active_EntityArea_1", "Monster_Sighting", true, 1);
+		AddEntityCollideCallback("servant_grunt_1", "Enemy_LeaveArea_1", "Enemy_LeaveArea", false, 1);
+		AddEntityCollideCallback("Player", "Look_Monster_1", "Look_Monster", true, 1);
+		AddEntityCollideCallback("Player", "LookAt_SlimeArea_1", "Look_Slime", true, 1);
+		
+		//-Entity interact Callbacks-//
+		SetEntityPlayerInteractCallback("work_desk_door_2", "GetTestQuest", true);
+		SetEntityPlayerInteractCallback("torch_static01_3", "Active_Light", true);
+		SetEntityPlayerInteractCallback("candlestick_wall_14", "Active_Light_2", true);
+		SetEntityPlayerInteractCallback("cabinet_nice_1", "Enemy_Noise", true);
+		SetEntityPlayerInteractCallback("candle_floor_5", "If_Statement1", true);
+		SetEntityPlayerInteractCallback("candle_floor_6", "If_Statement2", true);
+		
+		//-Timer Init-//
+		AddTimer("Creak", 3.5, "CreakTimer");
+		AddTimer("Scratch_Sounds", 6.0, "Scratch_Sounds");
+		AddTimer("WindSounds", 2.5, "Wind_Sounds");
+		AddTimer("EerieWind", 1 , "Eerie_Wind");
+		AddTimer("LibrarySound", 7.5, "Library_Sound");
+		
+		
+		//--PreloadSounds--//
+		PreloadSound("05_amb1");
+		
+		//---Connection Callbacks---//
+		
+		ConnectEntities("shelf_connection",		//Name of connection
+		"Secret_Lever", 	//Parent entity (Affects)
+		"Secret_Shelf",	//Child entity 	(Affected) 
+		false,		//Invert the state sent
+		1, 		//States used (0=both), checked before invertion.
+		"Move_Shelf");	//callback	
+		
+		/*ConnectEntities("shelf_connection",		//Name of connection
+		"Secret_Lever_1", 	//Parent entity (Affects)
+		"Secret_Shelf",	//Child entity 	(Affected) 
+		true,		//Invert the state sent
+		1, 		//States used (0=both), checked before invertion.
+		"Move_Shelf_1");	//callback	*/
+		
+		//Debug
+		//AddDebugMessage("Debug message test..", false);
+     }
+	 //===========================================
+     // This runs when the player enters the map
+     void OnEnter()
+     {
+		//PlayMusic("12_amb", true, 1, 5, 0, true);
+		StopMusic(2.5f, 0);
+		AutoSave();
+     }
+	 //===========================================
+     // This runs when the player leaves the map
+     void OnLeave()
+     {
+		//FUCK!
+     }
